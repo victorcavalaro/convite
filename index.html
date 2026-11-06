@@ -1,24 +1,202 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Formatura — Julia Ribeiro</title><link rel="stylesheet" href="style.css"><script src="config.js" defer></script><script src="main.js" defer></script></head><body>
-<nav class="mini-timeline" aria-label="Páginas do convite"><div class="timeline-line-mini"></div>
-<button class="timeline-dot-mini" data-target="hero" aria-label="Seja bem vindo"><span>Seja bem vindo</span></button>
-<button class="timeline-dot-mini" data-target="memory1" aria-label="convite"><span>convite</span></button>
-<button class="timeline-dot-mini" data-target="location" aria-label="localização"><span>localização</span></button>
-<button class="timeline-dot-mini" data-target="confirmation" aria-label="confirmação"><span>confirmação</span></button>
-</nav><main>
-<section class="page hero" id="hero" aria-label="Seja bem vindo">
-<picture><source media="(min-aspect-ratio: 1/1)" srcset="img/1d.jpg"><img class="page-art hero-cover" src="img/1p.jpg" alt="Seja bem vindo — Julia Ribeiro" fetchpriority="high"></picture>
-<button id="scrollDown" class="scroll-down" aria-label="Abrir convite">⌄</button>
-</section>
-<section class="page " id="memory1" aria-label="convite">
-<picture><source media="(min-aspect-ratio: 1/1)" srcset="img/2.jpg"><img class="page-art " src="img/2p.jpg" alt="convite — Julia Ribeiro" fetchpriority="high"></picture>
-</section>
-<section class="page " id="location" aria-label="localização">
-<picture><source media="(min-aspect-ratio: 1/1)" srcset="img/3d.jpg"><img class="page-art " src="img/3p.jpg" alt="localização — Julia Ribeiro" ></picture>
-<div class="map-box" id="mapBox"><p id="mapPlaceholder">Localização em breve</p><iframe id="mapFrame" title="Local da formatura no Google Maps" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen hidden></iframe></div>
-</section>
-<section class="page " id="confirmation" aria-label="confirmação">
-<picture><source media="(min-aspect-ratio: 1/1)" srcset="img/4d.jpg"><img class="page-art " src="img/4p.jpg" alt="confirmação — Julia Ribeiro" ></picture>
-<a id="confirmButton" class="confirm-button" role="link" tabindex="0" aria-label="Confirmar presença pelo WhatsApp" aria-disabled="true" target="_blank" rel="noopener noreferrer"></a><p id="confirmStatus" class="confirm-status" role="status"></p>
-</section>
-</main></body></html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#490d16">
+    <meta name="description"
+        content="Convite para o baile de formatura de Julia Ribeiro. 13 de fevereiro de 2027, às 20h30.">
+    <title>Julia Ribeiro · Baile de Formatura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="config.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+    <a class="skip" href="#conteudo">Ir para o convite</a>
+    <header class="site-header"><a href="#inicio" class="brand" aria-label="Julia Ribeiro, início">JR<span>JULIA
+                RIBEIRO</span></a><span class="header-date">DIREITO · 2027</span><button id="menu-button"
+            aria-expanded="false" aria-controls="menu">Índice <span aria-hidden="true">☰</span></button></header>
+    <nav id="menu" aria-label="Páginas do convite" hidden></nav>
+    <main id="conteudo">
+        <section class="page envelope-page" id="inicio" aria-labelledby="titulo-inicio">
+            <div class="envelope" id="envelope">
+                <div class="letter"><span>Um sonho. Uma conquista.</span><strong>Uma noite para celebrar.</strong></div>
+                <div class="fold fold-left"></div>
+                <div class="fold fold-right"></div>
+                <div class="fold fold-bottom"></div>
+                <div class="fold fold-top"></div><button class="seal" id="open-envelope"
+                    aria-label="Abrir o convite de Julia Ribeiro"><img src="assets/selo-jr.png" alt="" width="241"
+                        height="217"></button>
+                <div class="envelope-copy">
+                    <p class="eyebrow">VOCÊ FAZ PARTE DESTA HISTÓRIA</p>
+                    <h1 id="titulo-inicio">Um convite especial</h1>
+                    <p>Toque no selo para abrir</p>
+                </div>
+            </div>
+        </section>
+        <section class="page save-page" id="save-the-date" aria-labelledby="titulo-save" hidden>
+            <div class="ornament-lines" aria-hidden="true"></div>
+            <div class="save-heading">
+                <div class="emblem" aria-hidden="true"></div>
+                <p class="eyebrow">DRA. JULIA RIBEIRO</p>
+                <h2 id="titulo-save">Baile de Formatura</h2>
+            </div>
+            <!-- TROCAR FOTO DA FORMANDA: substitua assets/formanda.jpg ou altere fotos.formanda em config.js. -->
+            <img class="graduate-photo" data-photo="formanda" src="assets/formanda.jpg"
+                alt="Julia Ribeiro com beca e capelo de formatura">
+            <div class="save-card">
+                <p class="eyebrow">SAVE THE DATE</p>
+                <div class="divider" aria-hidden="true">✦</div>
+                <p class="save-date">13/02/27 <span>·</span> 20:30</p>
+            </div>
+        </section>
+        <section class="page paper invitation" id="convite" aria-labelledby="titulo-convite" hidden>
+            <div class="emblem" aria-hidden="true"></div>
+            <h2 id="titulo-convite">Queridos amigos e familiares,</h2>
+            <div class="letter-copy">
+                <p>Alguns sonhos exigem coragem.<br>Outros, dedicação.<br>Este exigiu ambos.</p>
+                <p>E agora chegou o momento de celebrar<br class="desktop-break"> essa conquista com as pessoas que<br
+                        class="desktop-break"> fizeram parte dessa caminhada.</p>
+                <div class="divider" aria-hidden="true">✦</div>
+                <p>Assim, com a bênção de Deus e de meus pais,<br class="desktop-break"> Te convido para fazer parte
+                    deste momento<br class="desktop-break"> tão especial de realização em minha formação.</p>
+            </div>
+            <div class="bottom-monogram" aria-hidden="true">JR</div>
+        </section>
+        <section class="page paper thanks" id="agradecimentos" aria-labelledby="titulo-agradecimentos" hidden>
+            <div class="emblem" aria-hidden="true"></div>
+            <h2 id="titulo-agradecimentos">Agradecimentos</h2>
+            <div class="thanks-grid">
+                <article class="gold-frame god"><span class="small-symbol" aria-hidden="true">✧</span>
+                    <h3>Primeiramente,<br>agradeço à Deus.</h3>
+                    <p>Sem a sua graça e bondade,<br> essa conquista jamais seria realizada. Toda honra e glória à Ele.
+                    </p>
+                </article>
+                <!-- TROCAR FOTO COM OS PAIS: substitua assets/familia.jpg ou altere fotos.familia em config.js. -->
+                <figure class="family-frame"><img data-photo="familia" src="assets/familia.jpg"
+                        alt="Julia recebendo um beijo de seus pais na formatura"></figure>
+                <article class="gold-frame parents">
+                    <h3>Aos meus pais,<br>Vanessa e Edimilson</h3>
+                    <p>Esta conquista também é de vocês. Se hoje realizo o sonho de concluir a faculdade de Direito, é
+                        porque nunca me faltaram o apoio, o incentivo e os esforços de vocês. Cada oportunidade que tive
+                        carrega um pouco dos sacrifícios que fizeram por mim. Obrigada por acreditarem nos meus sonhos e
+                        tornarem possível aquilo que, sozinha, talvez eu não conseguisse alcançar.</p>
+                    <p class="signature-note">Este diploma terá o meu nome,<br> mas esta vitória sempre será nossa.</p>
+                </article>
+            </div>
+        </section>
+        <section class="page paper location" id="local" aria-labelledby="titulo-local" hidden>
+            <div class="emblem" aria-hidden="true"></div>
+            <p class="eyebrow">NOSSO ENCONTRO</p>
+            <h2 id="titulo-local">A noite da celebração</h2>
+            <dl class="event-details">
+                <div>
+                    <dt><span aria-hidden="true">▦</span><span class="sr-only">Data</span></dt>
+                    <dd>13/02/27</dd>
+                </div>
+                <div>
+                    <dt><span class="clock-icon" aria-hidden="true"></span><span class="sr-only">Horário</span></dt>
+                    <dd>20:30</dd>
+                </div>
+                <div>
+                    <dt><span class="pin-icon" aria-hidden="true"></span><span class="sr-only">Local</span></dt>
+                    <dd>VIVARO<small>MARINGÁ / PR</small></dd>
+                </div>
+            </dl>
+            <div class="divider" aria-hidden="true">✦</div>
+            <h3 class="eyebrow">COMO CHEGAR</h3>
+            <p class="address" id="address"></p>
+            <div class="map-frame"><iframe id="map" title="Mapa do endereço da celebração" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div><a id="directions"
+                class="button" target="_blank" rel="noopener noreferrer">Abrir no Google Maps <span
+                    aria-hidden="true">↗</span></a>
+        </section>
+        <section class="page paper calendar-page" id="calendario" aria-labelledby="titulo-calendario" hidden>
+            <div class="emblem" aria-hidden="true"></div>
+            <h2 id="titulo-calendario">Fevereiro</h2>
+            <p class="year">2027</p>
+            <table class="calendar" aria-label="Fevereiro de 2027. Dia 13: baile de formatura.">
+                <thead>
+                    <tr>
+                        <th scope="col" aria-label="Domingo">D</th>
+                        <th scope="col" aria-label="Segunda-feira">S</th>
+                        <th scope="col" aria-label="Terça-feira">T</th>
+                        <th scope="col" aria-label="Quarta-feira">Q</th>
+                        <th scope="col" aria-label="Quinta-feira">Q</th>
+                        <th scope="col" aria-label="Sexta-feira">S</th>
+                        <th scope="col" aria-label="Sábado">S</th>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body"></tbody>
+            </table>
+            <div class="divider" aria-hidden="true">✦</div>
+            <div class="countdown-box">
+                <h3 class="eyebrow" id="countdown-title">FALTAM APENAS</h3>
+                <div class="countdown" role="timer" aria-label="Tempo restante para a formatura">
+                    <div><strong id="days">—</strong><span>DIAS</span></div>
+                    <div><strong id="hours">—</strong><span>HORAS</span></div>
+                    <div><strong id="minutes">—</strong><span>MINUTOS</span></div>
+                    <div><strong id="seconds">—</strong><span>SEGUNDOS</span></div>
+                </div>
+            </div>
+            <p class="calendar-note">Um dia marcado no calendário.<br>Uma memória para a vida inteira.</p><a
+                class="text-link" id="add-calendar" download="formatura-julia.ics">Adicionar à minha agenda ↓</a>
+        </section>
+        <section class="page paper guide" id="manual" aria-labelledby="titulo-manual" hidden>
+            <div class="emblem" aria-hidden="true"></div>
+            <h2 id="titulo-manual">Manual dos Convidados</h2>
+            <ul class="guide-list">
+                <li><span class="guide-icon" aria-hidden="true">♡</span>
+                    <div><a id="rsvp" target="_blank" rel="noopener noreferrer">Confirme sua presença aqui! <span
+                                aria-hidden="true">↗</span></a>
+                        <p>Será um prazer ter ao meu lado<br> nessa conquista! ♡</p>
+                    </div>
+                </li>
+                <li><span class="guide-icon camera-icon" aria-hidden="true"></span>
+                    <div>Tire foto com a formanda<br> antes de 00h</div>
+                </li>
+                <li><span class="guide-icon" aria-hidden="true">▱</span>
+                    <div>Utilizar os adesivos</div>
+                </li>
+                <li><span class="guide-icon" aria-hidden="true">♧</span>
+                    <div>Curtir muito ♡</div>
+                </li>
+                <li><span class="guide-icon" aria-hidden="true">✧</span>
+                    <div>Aproveitar SEM moderação<p>Open bar e open food!</p>
+                    </div>
+                </li>
+            </ul>
+            <div class="divider" aria-hidden="true">✦</div>
+            <div class="bottom-monogram" aria-hidden="true">JR</div>
+        </section>
+        <section class="page paper closing" id="com-carinho" aria-labelledby="titulo-carinho" hidden>
+            <div class="closing-frame">
+                <div class="emblem" aria-hidden="true"></div>
+                <div class="closing-copy">
+                    <p>Uma história construída<br> com fé, coragem e dedicação.</p>
+                    <div class="divider" aria-hidden="true">✦</div>
+                    <p>Que a noite da celebração<br> seja feita de encontros, abraços e<br> memórias que mereçam ser
+                        lembradas.</p>
+                </div>
+                <p class="with-love">Com carinho,</p>
+                <h2 id="titulo-carinho">Dra. Julia Ribeiro</h2>
+                <div class="signature-line" aria-hidden="true"></div><button class="text-link" id="restart">Voltar ao
+                    início ↺</button>
+            </div>
+        </section>
+    </main>
+    <footer class="navigation" id="navigation" hidden><button id="previous" aria-label="Página anterior">←
+            <span>Anterior</span></button>
+        <div><span id="page-name"></span><span id="page-number"></span></div><button id="next"><span>Próxima</span>
+            →</button>
+    </footer>
+</body>
+
+</html>
