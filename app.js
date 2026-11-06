@@ -5,12 +5,67 @@ const names = ['Boas-vindas', 'Save the date', 'O convite', 'Agradecimentos', 'D
 let current = 0;
 let opening = false;
 let openingTimer = 0;
+let unlocked = false;
 const menu = document.querySelector('#menu');
 const menuButton = document.querySelector('#menu-button');
 function closeMenu() { menu.hidden = true; menuButton.setAttribute('aria-expanded', 'false'); }
-// Todas as telas ficam no fluxo da página: rolagem livre, inclusive por toque.
+// O conteúdo só entra no fluxo após o clique no selo.
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-pages.forEach(page => { page.hidden = false; });
+const sealButton = document.querySelector('#open-envelope');
+const stage = document.querySelector('#conteudo');
+let lastPageChange = 0;
+function fitGate() {
+  // visualViewport acompanha a barra de endereço dinâmica do Safari.
+  const viewport = window.visualViewport;
+  const height = viewport && viewport.scale === 1 ? viewport.height : window.innerHeight;
+  document.documentElement.style.setProperty('--gate-height', `${Math.round(height)}px`);
+  document.documentElement.style.setProperty('--gate-header', `${document.querySelector('.site-header').offsetHeight}px`);
+  document.documentElement.style.setProperty('--navigation-height', `${document.querySelector('#navigation').offsetHeight}px`);
+}
+function lockInvitation(focus = false) {
+  clearTimeout(openingTimer);
+  opening = false;
+  unlocked = false;
+  document.body.classList.add('invitation-locked');
+  document.documentElement.classList.add('invitation-locked');
+  pages.forEach((page, i) => { page.hidden = i !== 0; page.inert = i !== 0; });
+  pages[0].classList.remove('leaving');
+  pages[1].classList.remove('entering');
+  document.querySelector('#envelope').classList.remove('opened');
+  sealButton.disabled = false;
+  menuButton.disabled = true;
+  closeMenu();
+  updateNavigation(0);
+  fitGate();
+  stage.scrollTop = 0;
+  window.scrollTo(0, 0);
+  if(focus) sealButton.focus({preventScroll:true});
+}
+function unlockInvitation() {
+  clearTimeout(openingTimer);
+  unlocked = true;
+  opening = false;
+  // Retira o envelope e libera o conteúdo no mesmo ciclo, sem rolagem intermediária.
+  pages.forEach((page, i) => { page.hidden = i !== 1; page.inert = i !== 1; });
+  document.body.classList.remove('invitation-locked');
+  document.documentElement.classList.remove('invitation-locked');
+  menuButton.disabled = false;
+  pages[0].classList.remove('leaving');
+  updateNavigation(1);
+  fitGate();
+  stage.scrollTop = 0;
+  lastPageChange = Date.now();
+  window.scrollTo(0, 0);
+  try { history.replaceState(null, '', '#save-the-date'); } catch (_) {}
+  const title = pages[1].querySelector('h2');
+  title.tabIndex = -1;
+  title.focus({preventScroll:true});
+  pages[1].classList.add('entering');
+}
+window.addEventListener('resize', fitGate, {passive:true});
+if(window.visualViewport) window.visualViewport.addEventListener('resize', fitGate, {passive:true});
+window.addEventListener('pageshow', event => { if(event.persisted) lockInvitation(); });
+if('scrollRestoration' in history) history.scrollRestoration = 'manual';
 function updateNavigation(index) {
   current = Math.max(0, Math.min(pages.length - 1, index));
   document.querySelector('#navigation').hidden = current === 0;
@@ -23,57 +78,88 @@ function updateNavigation(index) {
     else a.removeAttribute('aria-current');
   });
 }
-function showPage(index, updateHash = true, focus = true, smooth = true) {
-  clearTimeout(openingTimer);
-  opening = false;
-  pages[0].classList.remove('leaving');
+function showPage(index, updateHash = true, focus = true) {
   const target = Math.max(0, Math.min(pages.length - 1, index));
-  updateNavigation(target);
-  if(updateHash) history.replaceState(null, '', `#${pages[target].id}`);
   if(target === 0) {
-    document.querySelector('#envelope').classList.remove('opened');
-    opening = false;
+    lockInvitation(focus);
+    if(updateHash) { try { history.replaceState(null, '', '#inicio'); } catch (_) {} }
+    return;
   }
+  if(!unlocked) return;
+  pages.forEach((page, i) => { page.hidden = i !== target; page.inert = i !== target; });
+  pages.forEach(page => page.classList.remove('entering'));
+  updateNavigation(target);
+  fitGate();
+  stage.scrollTop = 0;
+  lastPageChange = Date.now();
+  if(updateHash) { try { history.replaceState(null, '', `#${pages[target].id}`); } catch (_) {} }
   closeMenu();
   if(focus) {
     const title = pages[target].querySelector('h1,h2');
     title.tabIndex = -1;
     title.focus({preventScroll:true});
   }
-  pages[target].scrollIntoView({behavior: smooth && focus && !reducedMotion() ? 'smooth' : 'instant', block:'start'});
+
 }
-// Sincroniza o índice e os botões quando o visitante rola manualmente.
-let scrollFrame = 0;
-function syncScroll() {
-  scrollFrame = 0;
-  const marker = window.innerHeight * 0.35;
-  let index = 0;
-  pages.forEach((page, i) => { if(page.getBoundingClientRect().top <= marker) index = i; });
-  if(index !== current) updateNavigation(index);
+// Rolagem interna: nunca monta duas páginas lado a lado ou empilhadas.
+const atTop = () => stage.scrollTop <= 2;
+const atBottom = () => stage.scrollTop + stage.clientHeight >= stage.scrollHeight - 3;
+function turnByGesture(direction) {
+  if(!unlocked || opening || Date.now() - lastPageChange < 800) return false;
+  const target = current + direction;
+  if(target < 1 || target >= pages.length) return false;
+  showPage(target);
+  return true;
 }
-function queueScrollSync() {
-  if(!scrollFrame) scrollFrame = requestAnimationFrame(syncScroll);
-}
-window.addEventListener('scroll', queueScrollSync, {passive:true});
-window.addEventListener('resize', queueScrollSync, {passive:true});
+let touch = null;
+stage.addEventListener('touchstart', event => {
+  if(!unlocked || event.touches.length !== 1 || event.target.closest('a,button,iframe,input,select,textarea')) { touch = null; return; }
+  touch = {x:event.touches[0].clientX, y:event.touches[0].clientY, top:atTop(), bottom:atBottom(), consumed:false};
+}, {passive:true});
+stage.addEventListener('touchmove', event => {
+  if(!touch || event.touches.length !== 1) return;
+  const dy = touch.y - event.touches[0].clientY;
+  const dx = touch.x - event.touches[0].clientX;
+  if(Math.abs(dx) > Math.abs(dy)) return;
+  const boundary = (dy > 0 && touch.bottom) || (dy < 0 && touch.top);
+  if(!boundary) return; // Um gesto que começou no texto apenas rola o texto.
+  if(event.cancelable) event.preventDefault();
+  if(!touch.consumed && Math.abs(dy) >= 70) {
+    touch.consumed = true;
+    turnByGesture(dy > 0 ? 1 : -1);
+  }
+}, {passive:false});
+stage.addEventListener('touchend', () => { touch = null; }, {passive:true});
+stage.addEventListener('touchcancel', () => { touch = null; }, {passive:true});
+let wheelLast = 0, wheelSum = 0, wheelEligible = false, wheelUsed = false, wheelDirection = 0;
+stage.addEventListener('wheel', event => {
+  if(!unlocked || event.ctrlKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+  const now = Date.now();
+  const direction = Math.sign(event.deltaY);
+  if(!direction) return;
+  // Inércia do trackpad não pode avançar várias páginas em um só gesto.
+  if(now - wheelLast > 220 || direction !== wheelDirection) {
+    wheelSum = 0; wheelUsed = false;
+    wheelEligible = direction > 0 ? atBottom() : atTop();
+  }
+  wheelLast = now; wheelDirection = direction;
+  if(!wheelEligible) return;
+  if(event.cancelable) event.preventDefault();
+  if(wheelUsed) return;
+  wheelSum += Math.abs(event.deltaY) * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientHeight : 1);
+  if(wheelSum >= 90) { wheelUsed = true; turnByGesture(direction); }
+}, {passive:false});
 names.forEach((name, i) => { const a = document.createElement('a'); a.href = `#${pages[i].id}`; a.textContent = `${String(i+1).padStart(2,'0')} · ${name}`; a.addEventListener('click', e => {e.preventDefault();showPage(i);}); menu.append(a); });
-menuButton.addEventListener('click', () => { menu.hidden = !menu.hidden; menuButton.setAttribute('aria-expanded', String(!menu.hidden)); });
-// Transição direta: a página 2 existe apenas uma vez no documento.
-document.querySelector('#open-envelope').addEventListener('click', () => {
-  if(opening) return;
+menuButton.addEventListener('click', () => { if(!unlocked) return; menu.hidden = !menu.hidden; menuButton.setAttribute('aria-expanded', String(!menu.hidden)); });
+// A conclusão não depende da seção detectada pela rolagem do navegador.
+sealButton.addEventListener('click', () => {
+  if(opening || unlocked) return;
   opening = true;
+  sealButton.disabled = true;
+  closeMenu();
   document.querySelector('#envelope').classList.add('opened');
   pages[0].classList.add('leaving');
-  openingTimer = setTimeout(() => {
-    opening = false;
-    if(current === 0) {
-      showPage(1, true, true, false);
-      pages[1].classList.remove('entering');
-      void pages[1].offsetWidth;
-      pages[1].classList.add('entering');
-    }
-    pages[0].classList.remove('leaving');
-  }, reducedMotion() ? 0 : 700);
+  openingTimer = setTimeout(unlockInvitation, reducedMotion() ? 0 : 700);
 });
 document.querySelector('#previous').addEventListener('click', () => showPage(current-1));
 document.querySelector('#next').addEventListener('click', () => showPage(current+1));
@@ -101,4 +187,5 @@ const escapeICS = s => s.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g
 const stamp = new Date(config.data).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
 const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Julia Ribeiro//Convite//PT-BR','BEGIN:VEVENT','UID:formatura-julia-20270213@convite.local','DTSTAMP:20261106T000000Z',`DTSTART:${stamp}`,'SUMMARY:Baile de Formatura — Julia Ribeiro',`LOCATION:${escapeICS(config.endereco)}`,`DESCRIPTION:${escapeICS('Vivaro — Maringá/PR. Com carinho, Dra. Julia Ribeiro.')}`,'END:VEVENT','END:VCALENDAR',''].join('\r\n');
 document.querySelector('#add-calendar').href=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));
-const initial = pages.findIndex(p=>`#${p.id}`===location.hash);showPage(initial>=0?initial:0,false,false);
+// Toda nova visita começa no selo, mesmo com um fragmento na URL.
+lockInvitation();

@@ -50,7 +50,7 @@ Endereço usado exatamente como informado: Avenida Virgílio Manilia, 21784 - Ja
 7. Manual dos convidados e confirmação por WhatsApp.
 8. Mensagem final e assinatura.
 
-Role livremente para ler as oito telas em sequência, no celular ou computador. Anterior/Próxima, o Índice e as setas do teclado levam até a seção desejada com rolagem suave. A barra inferior acompanha a seção visível. Os endereços com fragmentos, como `#manual`, abrem a tela correspondente. A opção de movimento reduzido do dispositivo é respeitada.
+Somente uma página fica visível por vez. Role dentro dela para ler conteúdos longos. Ao chegar ao fim, faça um novo gesto para avançar; no topo, um novo gesto para baixo retorna à anterior. Também é possível usar Anterior/Próxima, Índice e as setas do teclado. A inércia do trackpad não avança várias páginas de uma vez. Os endereços com fragmentos, como `#manual`, abrem a tela correspondente. A opção de movimento reduzido do dispositivo é respeitada.
 
 ## Internet e compatibilidade
 
@@ -68,6 +68,14 @@ O selo utiliza `assets/selo-jr.png`, arquivo original enviado, sem redesenho ou 
 
 Layout fluido, tamanhos de texto adaptáveis, altura automática para não cortar conteúdo, suporte à área segura do aparelho e agradecimentos em uma coluna nas telas mais estreitas. Funciona também com rotação de tela e zoom. O envelope mantém sua animação; as outras telas podem ser acessadas rolando.
 
-## Abertura do envelope
+## Abertura do envelope e Safari
 
-Ao tocar no selo, o envelope abre e desaparece em uma transição curta para a segunda página. Há apenas uma página Save the date no documento, sem cópia dentro do envelope. A rolagem livre e os botões de navegação continuam disponíveis. A preferência por movimento reduzido é respeitada.
+Toda visita começa com a capa bloqueada. As demais seções ficam ocultas e inertes; índice, links internos e rolagem não liberam o conteúdo. Ao clicar no selo, uma transição curta remove o envelope e exibe a página 2. A partir daí, a navegação por páginas e o índice ficam disponíveis. Voltar ao início restaura o bloqueio.
+
+A capa usa a altura visível do navegador (Visual Viewport, com fallback), acompanhando a barra de endereço do Safari. O conteúdo seguinte está oculto desde o HTML/CSS inicial, inclusive antes da execução do JavaScript. A conclusão da abertura não depende de eventos de rolagem nem de animationend. O retorno pelo cache de navegação restaura a capa com o selo clicável.
+
+Validação: sintaxe JavaScript e teste automatizado do estado bloqueado, desbloqueio, clique repetido e retorno à capa. Safari/iPhone real não disponível neste ambiente para validação visual.
+
+## Páginas isoladas
+
+As páginas inativas permanecem ocultas e inertes. A área de leitura ocupa o espaço entre o cabeçalho e os controles inferiores, sem mostrar faixas da página anterior ou seguinte. Textos longos continuam acessíveis com rolagem interna; a troca de página ocorre somente em novo gesto no limite ou pelos controles. No mapa, use a área ao redor para navegar entre páginas.

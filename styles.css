@@ -89,3 +89,28 @@ img{max-width:100%}
 @keyframes envelope-exit{0%,40%{opacity:1}100%{opacity:0}}
 @keyframes invitation-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.envelope-page.leaving,.save-page.entering{animation:none!important}}
+
+/* CAPA BLOQUEADA: regras presentes antes de executar JavaScript. */
+html.invitation-locked{overflow:hidden;overscroll-behavior:none}
+body.invitation-locked{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--dark)}
+.invitation-locked #conteudo{padding:0!important;margin:0;overflow:hidden}
+.invitation-locked #conteudo>.page:not(#inicio),
+.invitation-locked #navigation,.invitation-locked #menu,
+.invitation-locked #menu-button,.invitation-locked .skip{display:none!important}
+.invitation-locked .site-header{position:fixed;top:0;left:0;width:100%;z-index:20}
+.invitation-locked #inicio{position:fixed;top:var(--gate-header,82px);left:50%;transform:translateX(-50%);width:100%;max-width:710px;height:calc(var(--gate-height,100dvh) - var(--gate-header,82px));min-height:0!important;max-height:none!important;margin:0!important;border:0;overflow:hidden;box-shadow:none;scroll-margin:0}
+.invitation-locked #envelope{overflow:hidden}
+.invitation-locked .envelope-copy{bottom:max(7%,env(safe-area-inset-bottom,0px))}
+.invitation-locked .envelope-copy h1{margin:12px 0 8px}
+@media(max-width:600px){.invitation-locked #inicio{top:var(--gate-header,65px);height:calc(var(--gate-height,100dvh) - var(--gate-header,65px))}}
+@supports not (height:100dvh){.invitation-locked #inicio{height:calc(var(--gate-height,100vh) - var(--gate-header,82px))}}
+@media(max-height:480px){.invitation-locked .envelope-copy .eyebrow{display:none}.invitation-locked .envelope-copy h1{font-size:28px;margin:4px 0}.invitation-locked .envelope-copy>p:last-child{font-size:14px}.invitation-locked .seal{top:39%;width:80px}}
+
+/* Uma única página por tela, com rolagem interna para conteúdos longos. */
+html,body{overflow:hidden;overscroll-behavior:none;height:100%}
+body{position:fixed;inset:0;width:100%;height:var(--gate-height,100dvh)}
+.site-header{position:fixed;top:0;left:0;width:100%;z-index:20}
+body:not(.invitation-locked) #conteudo{position:absolute;top:var(--gate-header,82px);left:50%;transform:translateX(-50%);width:100%;max-width:710px;height:calc(var(--gate-height,100dvh) - var(--gate-header,82px) - var(--navigation-height,72px));margin:0;padding:0!important;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scroll-behavior:auto;background:var(--cream)}
+body:not(.invitation-locked) #conteudo>.page{width:100%;min-height:100%!important;height:auto;margin:0!important;border:0;box-shadow:none;scroll-margin:0;animation:none!important}
+body:not(.invitation-locked) .navigation{position:absolute;top:calc(var(--gate-height,100dvh) - var(--navigation-height,72px));bottom:auto;margin:0;box-shadow:none;background:#f5eddf;backdrop-filter:none}
+@media(max-width:600px){body:not(.invitation-locked) #conteudo{top:var(--gate-header,65px);height:calc(var(--gate-height,100dvh) - var(--gate-header,65px) - var(--navigation-height,72px))}}
