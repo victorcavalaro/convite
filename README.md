@@ -50,7 +50,7 @@ Endereço usado exatamente como informado: Avenida Virgílio Manilia, 21784 - Ja
 7. Manual dos convidados e confirmação por WhatsApp.
 8. Mensagem final e assinatura.
 
-Use Anterior/Próxima, o Índice ou as setas do teclado. Os endereços com fragmentos, como `#manual`, abrem a tela correspondente. A opção de movimento reduzido do dispositivo é respeitada.
+Role livremente para ler as oito telas em sequência, no celular ou computador. Anterior/Próxima, o Índice e as setas do teclado levam até a seção desejada com rolagem suave. A barra inferior acompanha a seção visível. Os endereços com fragmentos, como `#manual`, abrem a tela correspondente. A opção de movimento reduzido do dispositivo é respeitada.
 
 ## Internet e compatibilidade
 
@@ -63,3 +63,11 @@ Verificados: sintaxe dos arquivos JavaScript, oito telas, IDs e imagens locais, 
 ## Selo atualizado
 
 O selo utiliza `assets/selo-jr.png`, arquivo original enviado, sem redesenho ou filtros. O CSS recorta apenas a área externa ao selo para integrá-lo ao envelope. O clique e a animação de abertura foram preservados.
+
+## Ajuste a celulares
+
+Layout fluido, tamanhos de texto adaptáveis, altura automática para não cortar conteúdo, suporte à área segura do aparelho e agradecimentos em uma coluna nas telas mais estreitas. Funciona também com rotação de tela e zoom. O envelope mantém sua animação; as outras telas podem ser acessadas rolando.
+
+## Abertura do envelope
+
+Ao tocar no selo, o envelope abre e desaparece em uma transição curta para a segunda página. Há apenas uma página Save the date no documento, sem cópia dentro do envelope. A rolagem livre e os botões de navegação continuam disponíveis. A preferência por movimento reduzido é respeitada.
