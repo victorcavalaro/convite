@@ -13,7 +13,7 @@ function closeMenu() { menu.hidden = true; menuButton.setAttribute('aria-expande
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sealButton = document.querySelector('#open-envelope');
 const stage = document.querySelector('#conteudo');
-let lastPageChange = 0;
+
 function fitGate() {
   // visualViewport acompanha a barra de endereço dinâmica do Safari.
   const viewport = window.visualViewport;
@@ -46,7 +46,7 @@ function unlockInvitation() {
   unlocked = true;
   opening = false;
   // Retira o envelope e libera o conteúdo no mesmo ciclo, sem rolagem intermediária.
-  pages.forEach((page, i) => { page.hidden = i !== 1; page.inert = i !== 1; });
+  pages.forEach((page, i) => { page.hidden = i === 0; page.inert = i === 0; });
   document.body.classList.remove('invitation-locked');
   document.documentElement.classList.remove('invitation-locked');
   menuButton.disabled = false;
@@ -54,7 +54,6 @@ function unlockInvitation() {
   updateNavigation(1);
   fitGate();
   stage.scrollTop = 0;
-  lastPageChange = Date.now();
   window.scrollTo(0, 0);
   try { history.replaceState(null, '', '#save-the-date'); } catch (_) {}
   const title = pages[1].querySelector('h2');
@@ -86,69 +85,32 @@ function showPage(index, updateHash = true, focus = true) {
     return;
   }
   if(!unlocked) return;
-  pages.forEach((page, i) => { page.hidden = i !== target; page.inert = i !== target; });
-  pages.forEach(page => page.classList.remove('entering'));
   updateNavigation(target);
-  fitGate();
-  stage.scrollTop = 0;
-  lastPageChange = Date.now();
-  if(updateHash) { try { history.replaceState(null, '', `#${pages[target].id}`); } catch (_) {} }
   closeMenu();
+  if(updateHash) { try { history.replaceState(null, '', `#${pages[target].id}`); } catch (_) {} }
+  pages[target].scrollIntoView({behavior: reducedMotion() ? 'instant' : 'smooth', block:'start'});
   if(focus) {
     const title = pages[target].querySelector('h1,h2');
     title.tabIndex = -1;
     title.focus({preventScroll:true});
   }
-
 }
-// Rolagem interna: nunca monta duas páginas lado a lado ou empilhadas.
-const atTop = () => stage.scrollTop <= 2;
-const atBottom = () => stage.scrollTop + stage.clientHeight >= stage.scrollHeight - 3;
-function turnByGesture(direction) {
-  if(!unlocked || opening || Date.now() - lastPageChange < 800) return false;
-  const target = current + direction;
-  if(target < 1 || target >= pages.length) return false;
-  showPage(target);
-  return true;
+// Atualiza a indicação da seção atual sem interferir na rolagem natural.
+let scheduled = false;
+function syncNavigationOnScroll() {
+  if(!unlocked || scheduled) return;
+  scheduled = true;
+  requestAnimationFrame(() => {
+    scheduled = false;
+    const marker = window.scrollY + window.innerHeight * 0.35;
+    let visibleIndex = 1;
+    pages.forEach((page, i) => {
+      if(i > 0 && page.offsetTop <= marker) visibleIndex = i;
+    });
+    if(visibleIndex !== current) updateNavigation(visibleIndex);
+  });
 }
-let touch = null;
-stage.addEventListener('touchstart', event => {
-  if(!unlocked || event.touches.length !== 1 || event.target.closest('a,button,iframe,input,select,textarea')) { touch = null; return; }
-  touch = {x:event.touches[0].clientX, y:event.touches[0].clientY, top:atTop(), bottom:atBottom(), consumed:false};
-}, {passive:true});
-stage.addEventListener('touchmove', event => {
-  if(!touch || event.touches.length !== 1) return;
-  const dy = touch.y - event.touches[0].clientY;
-  const dx = touch.x - event.touches[0].clientX;
-  if(Math.abs(dx) > Math.abs(dy)) return;
-  const boundary = (dy > 0 && touch.bottom) || (dy < 0 && touch.top);
-  if(!boundary) return; // Um gesto que começou no texto apenas rola o texto.
-  if(event.cancelable) event.preventDefault();
-  if(!touch.consumed && Math.abs(dy) >= 70) {
-    touch.consumed = true;
-    turnByGesture(dy > 0 ? 1 : -1);
-  }
-}, {passive:false});
-stage.addEventListener('touchend', () => { touch = null; }, {passive:true});
-stage.addEventListener('touchcancel', () => { touch = null; }, {passive:true});
-let wheelLast = 0, wheelSum = 0, wheelEligible = false, wheelUsed = false, wheelDirection = 0;
-stage.addEventListener('wheel', event => {
-  if(!unlocked || event.ctrlKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
-  const now = Date.now();
-  const direction = Math.sign(event.deltaY);
-  if(!direction) return;
-  // Inércia do trackpad não pode avançar várias páginas em um só gesto.
-  if(now - wheelLast > 220 || direction !== wheelDirection) {
-    wheelSum = 0; wheelUsed = false;
-    wheelEligible = direction > 0 ? atBottom() : atTop();
-  }
-  wheelLast = now; wheelDirection = direction;
-  if(!wheelEligible) return;
-  if(event.cancelable) event.preventDefault();
-  if(wheelUsed) return;
-  wheelSum += Math.abs(event.deltaY) * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientHeight : 1);
-  if(wheelSum >= 90) { wheelUsed = true; turnByGesture(direction); }
-}, {passive:false});
+window.addEventListener('scroll', syncNavigationOnScroll, {passive:true});
 names.forEach((name, i) => { const a = document.createElement('a'); a.href = `#${pages[i].id}`; a.textContent = `${String(i+1).padStart(2,'0')} · ${name}`; a.addEventListener('click', e => {e.preventDefault();showPage(i);}); menu.append(a); });
 menuButton.addEventListener('click', () => { if(!unlocked) return; menu.hidden = !menu.hidden; menuButton.setAttribute('aria-expanded', String(!menu.hidden)); });
 // A conclusão não depende da seção detectada pela rolagem do navegador.
