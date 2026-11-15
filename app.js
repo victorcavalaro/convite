@@ -1,7 +1,7 @@
 'use strict';
 const config = window.CONVITE;
 const pages = [...document.querySelectorAll('.page')];
-const names = ['Boas-vindas', 'Save the date', 'O convite', 'Agradecimentos', 'Data e local', 'Contagem regressiva', 'Manual dos convidados', 'Com carinho'];
+const names = ['Boas-vindas', 'Save the date', 'O convite', 'Agradecimentos', 'Data e local', 'Contagem regressiva', 'Pagamento', 'Manual dos convidados', 'Com carinho'];
 let current = 0;
 let opening = false;
 let openingTimer = 0;
@@ -71,7 +71,7 @@ function updateNavigation(index) {
   document.querySelector('#previous').disabled = current === 0;
   document.querySelector('#next').hidden = current === pages.length - 1;
   document.querySelector('#page-name').textContent = names[current];
-  document.querySelector('#page-number').textContent = `${String(current + 1).padStart(2, '0')} / 08`;
+  document.querySelector('#page-number').textContent = `${String(current + 1).padStart(2, '0')} / ${String(pages.length).padStart(2, '0')}`;
   menu.querySelectorAll('a').forEach((a, i) => {
     if(i === current) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
@@ -102,10 +102,12 @@ function syncNavigationOnScroll() {
   scheduled = true;
   requestAnimationFrame(() => {
     scheduled = false;
-    const marker = window.scrollY + window.innerHeight * 0.35;
+    const marker = document.querySelector('.site-header').offsetHeight +
+      (window.innerHeight - document.querySelector('.site-header').offsetHeight -
+      document.querySelector('#navigation').offsetHeight) * 0.35;
     let visibleIndex = 1;
     pages.forEach((page, i) => {
-      if(i > 0 && page.offsetTop <= marker) visibleIndex = i;
+      if(i > 0 && page.getBoundingClientRect().top <= marker) visibleIndex = i;
     });
     if(visibleIndex !== current) updateNavigation(visibleIndex);
   });
@@ -131,7 +133,7 @@ window.addEventListener('hashchange', () => { const i=pages.findIndex(p=>`#${p.i
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape') {closeMenu();menuButton.focus();}
   if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.altKey || e.ctrlKey || e.metaKey) return;
-  if(e.key === 'ArrowRight' && current>0 && current<7) showPage(current+1);
+  if(e.key === 'ArrowRight' && current>0 && current<pages.length-1) showPage(current+1);
   if(e.key === 'ArrowLeft' && current>0) showPage(current-1);
 });
 document.querySelectorAll('[data-photo]').forEach(img => { img.src = config.fotos[img.dataset.photo]; });
